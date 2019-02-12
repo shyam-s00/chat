@@ -5,7 +5,7 @@ import 'package:uuid/uuid.dart';
 class User {
   String email;
   String displayName;
-  Uuid id;
+  String id;
   String avatarUrl;
 
   User(id, {this.email, this.displayName, this.avatarUrl}) : this.id = id ?? Uuid().v1();
@@ -35,6 +35,6 @@ class User {
     displayName = json['displayName'];
     email = json['email'];
     avatarUrl = json['avatarUrl'];
-    id = Uuid().parse(json['id']) as Uuid;
+    id = json['id'];
   }
 }

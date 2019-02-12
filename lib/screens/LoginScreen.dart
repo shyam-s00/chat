@@ -1,4 +1,5 @@
 import 'package:chat/models/User.dart';
+import 'package:chat/screens/ChatScreen.dart';
 import 'package:chat/shared/presentation/TextStyles.dart';
 import 'package:chat/shared/services/CloudStore.dart';
 import 'package:flutter/material.dart';
@@ -19,6 +20,7 @@ class LoginScreenState extends State<LoginScreen> {
 
   String _email;
   String _pwd;
+  bool _showError = false;
 
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _pwdController = TextEditingController();
@@ -68,15 +70,38 @@ class LoginScreenState extends State<LoginScreen> {
                 ),
               ),
               new SizedBox(
-                height: 25,
+                height: 20,
               ),
-              Builder(
-                builder: (ctx) => new MaterialButton(
-                onPressed: () => loginWithEmail(ctx),
-                child: new Text('Login'),
-                elevation: 5.0,
-                color: Theme.of(context).buttonColor
+              Padding(
+                padding: EdgeInsets.all(30),
+                child: Builder(
+                  builder: (ctx) => RaisedButton(
+                      colorBrightness: Brightness.light,
+                      onPressed: () => loginWithEmail(ctx),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(20)
+                      ),
+                      child: Text('Login'),
+                      elevation: 8.0,
+                      color: Theme.of(context).buttonColor
+                  ),
                 ),
+              ),
+              Visibility(
+                visible: _showError,
+                maintainSize: true,
+                maintainAnimation: true,
+                maintainState: true,
+                child: TextFormField(
+                  enabled: false,
+                  initialValue: 'Incorrect username or password.',
+                  decoration: InputDecoration.collapsed(hintText: null),
+                  style: TextStyle(
+                    fontSize: 12,
+                    color: Colors.red,
+                    wordSpacing: 2,
+                  )
+                )
               ),
             ],
           ),
@@ -87,6 +112,9 @@ class LoginScreenState extends State<LoginScreen> {
 
   Future<User> loginWithEmail(BuildContext context) async {
     var form = _formKey.currentState;
+    setState(() {
+      _showError = false;
+    });
     if (form.validate()) {
       form.save();
       User user;
@@ -94,16 +122,16 @@ class LoginScreenState extends State<LoginScreen> {
         user = await widget.auth.login(_email, _pwd);
 
         if (user != null) {
-          Scaffold.of(context).showSnackBar(
-              SnackBar(content: Text(user.email + " Logged in Sucessfully")));
+          Navigator.of(context).push(new MaterialPageRoute(builder: (ctx) => new ChatScreen(user)));
         }
       }
       on PlatformException catch(pe) {
+        setState(() {
+          _showError = true;
+        });
         Scaffold.of(context).showSnackBar(
-            SnackBar(content: Text(_email + " is not valid")));
+            SnackBar(content: Text("Login Failed.")));
       }
-
-
       return user;
     }
     return Future.value(null);
