@@ -1,6 +1,8 @@
 import 'package:chat/models/Message.dart';
 import 'package:chat/models/User.dart';
 import 'package:chat/shared/presentation/TextStyles.dart';
+import 'package:chat/shared/services/CloudStore.dart';
+import 'package:chat/widgets/MessageWidget.dart';
 import 'package:flutter/material.dart';
 
 class ChatScreen extends StatefulWidget {
@@ -15,7 +17,13 @@ class ChatScreen extends StatefulWidget {
 class ChatScreenState extends State<ChatScreen> {
 
   List<Message> messages = new List<Message>();
+  CloudStore client = new CloudStore();
 
+  @override
+  void initState() {
+    client.getAllMessages().listen(onNext);
+    super.initState();
+  }
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -55,7 +63,50 @@ class ChatScreenState extends State<ChatScreen> {
 
   Widget _buildChatScreen() {
     return Container(
-      child: Text('Chat Message list comes here')
+      child: Column(
+        children: <Widget>[
+          Flexible(
+            child: ListView.builder(
+              padding: EdgeInsets.all(8.0),
+              itemBuilder: (_, int index) {
+                var model = messages[index];
+                return MessageWidget(model, index, () => _selectMessage(model), () => _deleteOnPressed(index), (__) => _deleteOnDismiss(model.msgId));
+              },
+              reverse: true,
+              itemCount: messages.length,
+            )
+          )
+        ],
+      )
     );
+  }
+
+  void _selectMessage(Message message) {
+    if (message != null) {
+      setState(() {
+        message.isSelected ? message.isSelected = false : message.isSelected = true;
+      });
+    }
+  }
+
+  void _deleteOnPressed(int index) {
+    setState(() {
+      messages.removeAt(index);
+    });
+  }
+
+  void _deleteOnDismiss(String msgId) {
+    setState(() {
+      messages.removeWhere((Message m) => m.msgId == msgId);
+    });
+  }
+
+
+  void onNext(List<Message> event) {
+    setState(() {
+      messages.clear();
+      messages.addAll(event);
+    });
+
   }
 }
