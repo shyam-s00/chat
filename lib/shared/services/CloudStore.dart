@@ -13,9 +13,27 @@ class CloudStore {
 
   CloudStore() : this._firebaseAuth = FirebaseAuth.instance, this._firestore = Firestore.instance;
 
+  //TODO: Auth methods to be moved to separate class
   Future<User> login(String userEmail, String pwd) async {
     return _firebaseAuth.signInWithEmailAndPassword(email: userEmail, password: pwd)
         .then((fb) => _mapToUser(fb));
+  }
+
+  Future<void> signUp(String emailId, String password, {String displayName, String photoUrl}) {
+    var userInfo = new UserUpdateInfo();
+    userInfo.displayName = displayName;
+    userInfo.photoUrl = photoUrl;
+
+    return _firebaseAuth.createUserWithEmailAndPassword(email: emailId, password: password)
+        .then((user) => user.updateProfile(userInfo));
+  }
+
+  Future<void> addMessage(Message message) {
+    return _firestore.collection(path).document(message.msgId).setData(message.toJson());
+  }
+
+  Future<void> deleteMessage(String msgId) {
+    return _firestore.collection(path).document(msgId).delete();
   }
 
   Stream<List<Message>> getAllMessages() {

@@ -1,8 +1,10 @@
 import 'package:chat/models/Message.dart';
 import 'package:chat/models/User.dart';
+import 'package:chat/screens/maindrawerscreen.dart';
 import 'package:chat/shared/presentation/TextStyles.dart';
 import 'package:chat/shared/services/CloudStore.dart';
 import 'package:chat/widgets/MessageWidget.dart';
+import 'package:chat/widgets/sendtextwidget.dart';
 import 'package:flutter/material.dart';
 
 class ChatScreen extends StatefulWidget {
@@ -18,6 +20,7 @@ class ChatScreenState extends State<ChatScreen> {
 
   List<Message> messages = new List<Message>();
   CloudStore client = new CloudStore();
+  final TextEditingController _sendTextController = new TextEditingController();
 
   @override
   void initState() {
@@ -41,22 +44,7 @@ class ChatScreenState extends State<ChatScreen> {
           )
         ],
       ),
-      drawer: Drawer(
-        child: Column(
-          children: <Widget>[
-            UserAccountsDrawerHeader(
-                accountName: Text('Dummy User'),
-                accountEmail: Text('none@none.com')
-            ),
-            Column(
-              children: <Widget>[
-                Text('More items to come here')
-              ],
-            )
-          ],
-        ),
-      ),
-
+      drawer: MainDrawerScreen(displayName: widget.user.displayName, emailId: widget.user.email),
       body: _buildChatScreen(),
     );
   }
@@ -75,10 +63,29 @@ class ChatScreenState extends State<ChatScreen> {
               reverse: true,
               itemCount: messages.length,
             )
+          ),
+          Divider(
+            height: 1.0,
+          ),
+          Container(
+            decoration: BoxDecoration(color: Theme.of(context).cardColor),
+            child: SendTextWidget(sendTextController: _sendTextController, onPressed: () => _onSubmitted(_sendTextController.text)),
           )
         ],
       )
     );
+  }
+
+  void _onSubmitted(String text) {
+    _sendTextController.clear();
+
+    String owner = widget.user.displayName ?? widget.user.email;
+    Message msg = Message.create(owner, text, sentDate: DateTime.now());
+    if (msg != null) {
+      setState(() {
+        messages.insert(0, msg);
+      });
+    }
   }
 
   void _selectMessage(Message message) {

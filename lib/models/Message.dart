@@ -51,6 +51,7 @@ class Message {
   // factory methods
   static Message create(String owner, String msg, {DateTime sentDate, String avatar = ''}) {
     var avatarText =  avatar.isEmpty ? owner.substring(0, 1) : avatar;
-    return new Message(owner, msgBody: msg, sentDate: sentDate ?? DateTime.now(), avatar: avatarText);
+    return new Message(owner, msgBody: msg, sentDate: sentDate ?? DateTime.now(), avatar: avatarText.toUpperCase());
   }
+
 }
