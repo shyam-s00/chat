@@ -17,4 +17,6 @@ class TextStyles {
 
   static TextStyle get appBarHeading5 => const TextStyle(fontSize: 8);
   static TextStyle get appBarHeadingBold5 => const TextStyle(fontSize: 8, fontWeight: FontWeight.bold);
+
+  static TextStyle get loadingText => const TextStyle(fontSize: 48, fontWeight: FontWeight.bold);
 }

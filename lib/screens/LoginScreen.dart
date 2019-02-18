@@ -81,7 +81,7 @@ class LoginScreenState extends State<LoginScreen> {
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(20)
                       ),
-                      child: Text('Login'),
+                      child: Text('Sign in'),
                       elevation: 8.0,
                       color: Theme.of(context).buttonColor
                   ),
@@ -119,16 +119,40 @@ class LoginScreenState extends State<LoginScreen> {
       form.save();
       User user;
       try {
+        showDialog(
+          context: context,
+          barrierDismissible: false,
+          builder: (BuildContext context )  {
+            return Dialog(
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(4.0))),
+              child: Center(
+                heightFactor: 3,
+                widthFactor: 5,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: <Widget>[
+                    CircularProgressIndicator(strokeWidth: 6.0),
+                    SizedBox(width: 20),
+                    Text('Signing in ...', style: Theme.of(context).textTheme.subhead)
+                  ],
+                ),
+              )
+            );
+          }
+        );
         user = await widget.auth.login(_email, _pwd);
+        Navigator.of(context).pop();
 
         if (user != null) {
           Navigator.of(context).push(new MaterialPageRoute(builder: (ctx) => new ChatScreen(user)));
         }
       }
-      on PlatformException catch(pe) {
+      on PlatformException {
         setState(() {
           _showError = true;
         });
+        Navigator.of(context).pop();
+
         Scaffold.of(context).showSnackBar(
             SnackBar(content: Text("Login Failed.")));
       }
