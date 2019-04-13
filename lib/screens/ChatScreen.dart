@@ -85,6 +85,7 @@ class ChatScreenState extends State<ChatScreen> {
       setState(() {
         messages.insert(0, msg);
       });
+      client.addMessage(msg);
     }
   }
 
@@ -106,6 +107,7 @@ class ChatScreenState extends State<ChatScreen> {
     setState(() {
       messages.removeWhere((Message m) => m.msgId == msgId);
     });
+    client.deleteMessage(msgId);
   }
 
 
