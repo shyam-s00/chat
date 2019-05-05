@@ -19,6 +19,15 @@ class CloudStore {
         .then((fb) => _mapToUser(fb));
   }
 
+  Stream<User> onAuthStateChanged() {
+    return this._firebaseAuth.onAuthStateChanged.map((FirebaseUser fb) => _mapToUser(fb));
+  }
+
+  Future<User> getCurrentUser() async {
+    return _firebaseAuth.currentUser()
+        .then((fb) => _mapToUser(fb));
+  }
+
   Future<void> signUp(String emailId, String password, {String displayName, String photoUrl}) {
     var userInfo = new UserUpdateInfo();
     userInfo.displayName = displayName;
